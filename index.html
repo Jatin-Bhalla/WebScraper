@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Careers Page Finder</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .input-container {
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Careers Page Finder</h2>
+    <div class="input-container">
+        <label for="urlInput">Enter URL:</label>
+        <input type="text" id="urlInput">
+        <button onclick="findCareersPage()">Find Careers Page</button>
+    </div>
+    <div id="resultBox"></div>
+</div>
+
+<script>
+    async function findCareersPage() {
+        const url = document.getElementById("urlInput").value;
+        const resultBox = document.getElementById("resultBox");
+
+        try {
+            // Fetch the webpage content
+            const response = await fetch(url);
+            const html = await response.text();
+
+            // Check if the HTML content contains the word "Career" (case-insensitive)
+            const foundCareers = html.toLowerCase().includes("career||careers||Careers||Career");
+
+            // Display the result
+            resultBox.textContent = foundCareers ? "Yes, careers page found." : "No, careers page not found.";
+        } catch (error) {
+            resultBox.textContent = "Error processing URL: " + error.message;
+        }
+    }
+</script>
+</body>
+</html>
