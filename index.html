@@ -22,8 +22,15 @@
 <div class="container">
     <h2>Careers Page Finder</h2>
     <div class="input-container">
-        <label for="urlInput">Enter URL:</label>
+        <label for="jobTitleInput">Enter Job:</label>
+        <input type="text" id="jobTitleInput">
+<br>
+        <label for="LocationInput">Enter Location:</label>
+        <input type="text" id="LocationInput">
+<br>
+        <label for="uInput">Enter URL:</label>
         <input type="text" id="urlInput">
+        <br>
         <button onclick="findCareersPage()">Find Careers Page</button>
     </div>
     <div id="resultBox"></div>
@@ -40,7 +47,7 @@
             const html = await response.text();
 
             // Check if the HTML content contains the word "Career" (case-insensitive)
-            const foundCareers = html.toLowerCase().includes("career||careers||Careers||Career");
+            const foundCareers = html.toLowerCase().includes("career");
 
             // Display the result
             resultBox.textContent = foundCareers ? "Yes, careers page found." : "No, careers page not found.";

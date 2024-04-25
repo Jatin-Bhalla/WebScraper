@@ -42,5 +42,5 @@ async function findRemoteSpans(url, visitedUrls = new Set()) {
 }
 
 // Example usage
-const baseUrl = "https://www.uplers.com"; // Replace this with the URL of the website
+const baseUrl = "https://example.com"; // Replace this with the URL of the website
 findRemoteSpans(baseUrl);
