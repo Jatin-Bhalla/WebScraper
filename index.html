@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Scraper</title>
+    <style>
+        body{
+            background-color: lavenderblush;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+        }
+        #input{
+            background-color: #6a5acd ;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 30%;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px); /* Calculate width to include padding */
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #9370db; /* MediumPurple */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #7b68ee; /* MediumSlateBlue */
+        }
+        #jobListingsContainer {
+            background-color: #e6e6fa; /* LavenderBlush */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #333; /* Dark gray */
+            width: 50%; /* Take up half of the available width */
+        }
+
+        #jobListings {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #333; /* Dark gray */
+        }
+    </style>
+</head>
+<body>
+    <div id="input">
+        <span>JOB:</span>
+        <input type="text" placeholder="search job" id="keywordInput">
+        <br>
+        <span>LOCATION:</span>
+        <input type="text" placeholder="search location" id="locationInput">
+        <div class="button-container">
+            <button id="search" onclick="onSearch()">SEARCH</button>
+        </div>
+    </div>
+    <div id="jobListingsContainer">
+        <h2>RESULTS:</h2>
+        <div id="joblistings"></div>
+    </div>
+
+    <script>function parsedResponse(data) {
+    console.log(data);
+    const jobListingsContainer = document.getElementById("joblistings"); // Corrected ID here
+    jobListingsContainer.innerHTML = ""; // Clear previous results
+
+    data.forEach(job => {
+        // Create elements
+        const jobListingDiv = document.createElement("div");
+        const titleHeading = document.createElement("h3");
+        const companyPara = document.createElement("p");
+        const locationPara = document.createElement("p");
+        const linkPara = document.createElement("p");
+        const jobLink = document.createElement("a");
+
+        // Set content and attributes
+        titleHeading.textContent = job.title;
+        companyPara.innerHTML = "<strong>Company:</strong> " + job.company;
+        locationPara.innerHTML = "<strong>Location:</strong> " + job.location;
+        jobLink.href = job.hrefLink;
+        jobLink.target = "_blank";
+        jobLink.textContent = "Job Link";
+
+        // Append elements
+        linkPara.appendChild(jobLink);
+        jobListingDiv.appendChild(titleHeading);
+        jobListingDiv.appendChild(companyPara);
+        jobListingDiv.appendChild(locationPara);
+        jobListingDiv.appendChild(linkPara);
+        jobListingsContainer.appendChild(jobListingDiv);
+    });
+}
+
+
+function onSearch() {
+    const keyword = document.getElementById("keywordInput").value;
+    const location = document.getElementById("locationInput").value;
+
+    fetch('http://localhost:3000/search', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            keyword: keyword,
+            location: location
+        })
+    })
+    .then(response => response.json())
+    .then(parsedResponse)
+    .catch(error => console.error("ERROR:", error));
+}
+
+
+
+    </script>
+</body>
+</html>

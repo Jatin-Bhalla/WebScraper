@@ -1,47 +1,26 @@
 const express = require('express');
-const axios = require('axios');
-const cheerio =require('cheerio');
+const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const { Console } = require('console');
+const axios = require('axios');
+const cheerio = require('cheerio');
+
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+
 const PORT = process.env.PORT || 3000;
 
-let job=[];
-
-app.post('/save', (req, res) => {
-    let newjob = {
-        // Define your job object here
-    };
-    // Assuming newjob is defined somewhere in your code
-    job.push(newjob);
-    fs.writeFile("job.json", JSON.stringify(job), (err) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error saving job data');
-        } else {
-            res.status(200).json(newjob);
-        }
-    });
-});
-
-// const url = 'https://www.linkedin.com/jobs/search?keywords=Frontend%20Developer&location=United%20States&pageNum=0';
-const keywords = "Backend Developer";
-const location = "United States";
-const url = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(keywords)}&location=${encodeURIComponent(location)}&pageNum=0`;
-
-
-app.get('/joblistings', async (req, res) => {
+const fetchJobListings = async (keyword, location) => {
     try {
+        const url = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}&pageNum=0`;
         const response = await axios.get(url);
+
         if (response.status === 200) {
             const html = response.data;
-            let $ = cheerio.load(html);
-            let jobListings = $('div.job-search-card');
-            let jobListingsArray=[];
+            const $ = cheerio.load(html);
+            const jobListings = $('div.job-search-card');
+            const jobListingsArray = [];
 
             jobListings.each((index, element) => {
                 const title = $(element).find('h3.base-search-card__title').text().trim();
@@ -51,29 +30,27 @@ app.get('/joblistings', async (req, res) => {
 
                 jobListingsArray.push({ title, company, location, hrefLink });
             });
-            
-            res.json(jobListingsArray);
 
-            
+            return jobListingsArray;
         } else {
-            res.status(500).send("Failed to fetch job listings.");
+            throw new Error("Failed to fetch job listings.");
         }
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).send("Error processing request.");
+        throw new Error("Error processing request.");
+    }
+};
+
+app.post('/search', async (req, res) => {
+    try {
+        const { keyword, location } = req.body;
+        const jobListings = await fetchJobListings(keyword, location);
+        res.json(jobListings);
+    } catch (error) {
+        res.status(500).send(error.message);
     }
 });
 
-
-
-
-// Serve the index.html file for the root path
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
-//t sends the index.html file back to the client as the response.
-
-
 app.listen(PORT, () => {
-    console.log(`Server listening at http://localhost:${PORT}`);
+    console.log(`Server is running on PORT: ${PORT}`);
 });
