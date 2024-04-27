@@ -14,4 +14,4 @@ to install dependencies:
 * npm install body-parser
 * npm install fs
 
-go to the folder location and run nodemon server.js
+go to the folder location and run: nodemon server.js
